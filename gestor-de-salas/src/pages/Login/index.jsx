@@ -6,10 +6,8 @@ import { useContext } from 'react'
 import { LoginContext } from '../../App'
 
 const Login = () => {
-
-
-    const { setLogado } = useContext(LoginContext)
-
+    const { setLogado, logado } = useContext(LoginContext)
+    
     return (
         <Container>
             <Box>
@@ -37,7 +35,12 @@ const Login = () => {
                     <Button
                         title={'Entrar'}
                         classes='w100'
-                        click={() => setLogado(true)}
+                        click={
+                            () => {
+                                setLogado(true)
+                                localStorage.setItem('logado', 'true')
+                            }
+                        }
                     />
                 </form>
             </Box>
@@ -62,14 +65,15 @@ const Box = styled.div`
         font-size: 28px;
         margin-bottom: 26px;
     }
-    & divIcon{
-        position: relative;
-        display: flex;
-    }
     & box-icon{
         position: absolute;
         margin: 8px;
     }
 `
+const divIcon = styled.div`
+    position: relative;
+    display: flex;
+`
+
 
 export default Login
