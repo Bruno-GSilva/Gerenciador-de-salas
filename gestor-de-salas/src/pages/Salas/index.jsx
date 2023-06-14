@@ -1,31 +1,30 @@
 import styled from "styled-components";
 import Button from "../../components/Button";
 import DataTable from "react-data-table-component";
+import axios from "axios";
+import { Input, Label } from "../../components/FormComponents";
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 
 const Salas = () => {
 
+  const [salas, setSalas] = useState([])
+
+  useEffect(() => {
+    axios.get('https://6489a1d55fa58521caaff60a.mockapi.io/rooms')
+      .then(function (response) {
+        setSalas(response.data)
+      })
+      .catch(function (error) {
+        console.error(error);
+      })
+  }, [])
+
   const [lateralCriar, setLateralCriar] = useState(false);
   const [lateralEditar, setLateralEditar] = useState(false);
-  const [salas, setSalas] = useState([
-    {
-      sala_id: 1,
-      sala_nome: 'Bill Gates',
-      sala_capacidade: 20
-    },
-    {
-      sala_id: 2,
-      sala_nome: 'Steve Jobs',
-      sala_capacidade: 32
-    },
-    {
-      sala_id: 3,
-      sala_nome: 'Larry Page',
-      sala_capacidade: 32
-    },
-  ]);
+ 
   const colunas = [
     {
       name: 'Id',
@@ -48,15 +47,15 @@ const Salas = () => {
       center: true,
       selector: (row) => (
         <Actions>
-          <box-icon 
-            name='pencil' 
+          <box-icon
+            name='pencil'
             onClick={() => {
               setValue('sala_id', row.sala_id);
               setValue('sala_nome', row.sala_nome);
               setValue('sala_capacidade', row.sala_capacidade);
               setLateralEditar(true);
             }}></box-icon>
-          <box-icon 
+          <box-icon
             name='trash'
             onClick={() => deletarSala(row.sala_id)}></box-icon>
         </Actions>
@@ -65,7 +64,7 @@ const Salas = () => {
   ]
 
   const { register, handleSubmit } = useForm();
-  const { register: registerEditar, handleSubmit: handleSubmitEditar, setValue} = useForm();
+  const { register: registerEditar, handleSubmit: handleSubmitEditar, setValue } = useForm();
 
   const cadastrarSala = (dados) => {
     dados.sala_id = salas.length + 1;
@@ -75,7 +74,7 @@ const Salas = () => {
 
   const atualizarSala = (dados) => {
     const salasAtualizadas = salas.map((sala) => {
-      if(sala.sala_id === dados.sala_id){
+      if (sala.sala_id === dados.sala_id) {
         let novaSala = {
           sala_id: dados.sala_id,
           sala_nome: dados.sala_nome,
@@ -88,10 +87,10 @@ const Salas = () => {
     setSalas(salasAtualizadas);
     setLateralEditar(false);
   }
-  
+
   const deletarSala = (sala_id) => {
     const salasRestantes = salas.filter(sala => {
-      if(sala.sala_id !== sala_id){
+      if (sala.sala_id !== sala_id) {
         return sala;
       }
     });
@@ -110,29 +109,29 @@ const Salas = () => {
         data={salas}
         columns={colunas} />
 
-      <Overlay 
-        className={lateralCriar || lateralEditar ? 'active' : ''} 
+      <Overlay
+        className={lateralCriar || lateralEditar ? 'active' : ''}
         onClick={() => {
           setLateralCriar(false);
           setLateralEditar(false);
         }} />
-      
+
       <Lateral className={lateralCriar && 'active'}>
         <Header>
           <h3>Adicionar</h3>
-          <Button 
-            title={'X'} 
-            classes={'circle pilled'} 
+          <Button
+            title={'X'}
+            classes={'circle pilled'}
             click={() => setLateralCriar(false)} />
         </Header>
         <Body>
           <form onSubmit={handleSubmit(cadastrarSala)}>
             <Label>Nome</Label>
-            <Input 
+            <Input
               placeholder="Digite o nome da sala"
               {...register('sala_nome')} />
             <Label>Capacidade</Label>
-            <Input 
+            <Input
               type="number"
               {...register('sala_capacidade')} />
             <Button title={'Salvar'} classes={'w100'} type='submit' />
@@ -143,20 +142,20 @@ const Salas = () => {
       <Lateral className={lateralEditar && 'active'}>
         <Header>
           <h3>Editar</h3>
-          <Button 
-            title={'X'} 
-            classes={'circle pilled'} 
+          <Button
+            title={'X'}
+            classes={'circle pilled'}
             click={() => setLateralEditar(false)} />
         </Header>
         <Body>
           <form onSubmit={handleSubmitEditar(atualizarSala)}>
-            <Input type="hidden" { ...registerEditar('sala_id')} />
+            <Input type="hidden" {...registerEditar('sala_id')} />
             <Label>Nome</Label>
-            <Input 
+            <Input
               placeholder="Digite o nome da sala"
               {...registerEditar('sala_nome')} />
             <Label>Capacidade</Label>
-            <Input 
+            <Input
               type="number"
               {...registerEditar('sala_capacidade')} />
             <Button title={'Salvar'} classes={'w100'} type='submit' />
@@ -219,27 +218,7 @@ const Lateral = styled.div`
   }
 `;
 
-const Label = styled.label`
-  font-size: 12px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 6px;
-  display: block;
-`;
 
-const Input = styled.input`
-  width: 100%;
-  height: 40px;
-  border: 2px solid #DDDDDD;
-  border-radius: 5px;
-  padding-left: 10px;
-  margin-bottom: 16px;
-  outline: none;
-  &:focus{
-    border-color: blueviolet;
-  }
-`;
 
 const Actions = styled.div`
   display: flex;
